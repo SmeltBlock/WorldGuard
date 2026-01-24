@@ -1,0 +1,41 @@
+name: Build JAR
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle (cache)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Ensure gradlew is executable
+        run: chmod +x ./gradlew
+
+      - name: Build (WorldGuard Bukkit dist jar)
+        run: ./gradlew --no-daemon --stacktrace :worldguard-bukkit:build
+
+      - name: Upload dist jar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: worldguard-bukkit-dist
+          path: |
+            worldguard-bukkit/build/libs/*-dist.jar
+          if-no-files-found: error
+          retention-days: 30

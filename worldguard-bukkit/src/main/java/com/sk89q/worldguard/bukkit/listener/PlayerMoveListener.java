@@ -84,6 +84,11 @@ public class PlayerMoveListener extends AbstractListener implements Runnable {
 
     @Override
     public void run() {
+        if (!WorldGuard.getInstance().getPlatform().getGlobalStateManager().usePlayerMove) {
+            lastPlayerLocations.clear();
+            return;
+        }
+
         Bukkit.getOnlinePlayers().forEach(player -> {
             Location from = lastPlayerLocations.getOrDefault(player.getUniqueId(), player.getLocation());
             Location to = player.getLocation().clone();
